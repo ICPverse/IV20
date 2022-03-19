@@ -30,7 +30,7 @@
   delayed_write_rate=16777216
   bytes_per_sync=0
   WAL_ttl_seconds=0
-  wal_dir=/home/ritik/ExternalIntegration/.dfx/state/replicated_state/node-100/ic_consensus_pool/consensus
+  wal_dir=/home/ritik/IV20/.dfx/state/replicated_state/node-100/ic_consensus_pool/consensus
   allow_ingest_behind=false
   max_total_wal_size=0
   max_log_file_size=0

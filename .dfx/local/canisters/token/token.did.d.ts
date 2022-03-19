@@ -18,6 +18,8 @@ export interface Token {
   'burn' : (arg_0: bigint) => Promise<TxReceipt>,
   'decimals' : () => Promise<number>,
   'distributeRewards' : () => Promise<Result>,
+  'distributeStakeDividends' : () => Promise<Result>,
+  'endStake' : () => Promise<Result>,
   'getAllowanceSize' : () => Promise<bigint>,
   'getHolders' : (arg_0: bigint, arg_1: bigint) => Promise<
       Array<[Principal, bigint]>
@@ -38,6 +40,14 @@ export interface Token {
   'setLogo' : (arg_0: string) => Promise<undefined>,
   'setName' : (arg_0: string) => Promise<undefined>,
   'setOwner' : (arg_0: Principal) => Promise<undefined>,
+  'showStaked' : () => Promise<bigint>,
+  'show_time' : () => Promise<bigint>,
+  'specialTransfer' : (
+      arg_0: Principal,
+      arg_1: bigint,
+      arg_2: string,
+    ) => Promise<TxReceipt>,
+  'stake' : (arg_0: bigint, arg_1: bigint) => Promise<Result>,
   'symbol' : () => Promise<string>,
   'totalSupply' : () => Promise<bigint>,
   'transfer' : (arg_0: Principal, arg_1: bigint) => Promise<TxReceipt>,
@@ -62,7 +72,9 @@ export type TxReceipt = { 'Ok' : bigint } |
       { 'ErrorOperationStyle' : null } |
       { 'Unauthorized' : null } |
       { 'LedgerTrap' : null } |
+      { 'WrongCode' : null } |
       { 'ErrorTo' : null } |
+      { 'NotEnoughUnlockedTokens' : null } |
       { 'Other' : string } |
       { 'BlockUsed' : null } |
       { 'AmountTooSmall' : null }

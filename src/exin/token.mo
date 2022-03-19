@@ -36,6 +36,7 @@ shared(msg) actor class Token(
         owner : Principal;
         fee : Nat;
     };
+    public type Result = Result.Result<(),Text>;
     // returns tx index or error msg
     public type TxReceipt = {
         #Ok: Nat;
@@ -49,6 +50,8 @@ shared(msg) actor class Token(
             #Other: Text;
             #BlockUsed;
             #AmountTooSmall;
+            #WrongCode;
+            #NotEnoughUnlockedTokens;
         };
     };
 
@@ -63,6 +66,14 @@ shared(msg) actor class Token(
     private stable var fee : Nat = _fee;
     private stable var balanceEntries : [(Principal, Nat)] = [];
     private stable var allowanceEntries : [(Principal, [(Principal, Nat)])] = [];
+    private stable var designationTime : [(Principal,Int)] = [];
+    private stable var designationType : [(Principal,Text)] = [];
+    private stable var designationAmount : [(Principal,Nat)] = [];
+    private stable var stakeTime : [(Principal,Int)] = [];
+    private var desTimeHash = HashMap.HashMap<Principal, Int>(0, Principal.equal, Principal.hash);
+    private var desTypeHash = HashMap.HashMap<Principal, Text>(0, Principal.equal, Principal.hash);
+    private var desAmountHash = HashMap.HashMap<Principal, Nat>(0, Principal.equal, Principal.hash);
+    private var stakeTimeHash = HashMap.HashMap<Principal, Int>(0, Principal.equal, Principal.hash);
     private var balances = HashMap.HashMap<Principal, Nat>(1, Principal.equal, Principal.hash);
     private var allowances = HashMap.HashMap<Principal, HashMap.HashMap<Principal, Nat>>(1, Principal.equal, Principal.hash);
     balances.put(owner_, totalSupply_);
@@ -139,6 +150,361 @@ shared(msg) actor class Token(
         Nat64.fromNat(i)
     };
 
+    func minBalance(p : Principal) : Nat {
+        var minBal = 0;
+        var allotTime : Int = 0;
+        var numToken = 0;
+        let timeOfAllotment = desTimeHash.get(p);
+        let typeOfWallet = desTypeHash.get(p);
+        let numberOfTokens = desAmountHash.get(p);
+
+            switch (typeOfWallet){
+                case null {
+                    minBal := 0;
+                };
+                case (?"Staked") {
+                    let stakeDur = stakeTimeHash.get(p);
+                    var finalTime : Int = 0;
+                    switch (stakeDur) {
+                        case null {
+                            return 0;
+                        };
+                        case (?int) {
+                            finalTime := int;
+                        };
+                    };
+                    switch (timeOfAllotment) {
+                        case null {
+                            allotTime := 0;
+                        };
+                        case (?int) {
+                            allotTime := int;
+                        };
+                    };
+
+                    if (finalTime < Time.now()){
+                        minBal := 0;
+                        stakeTimeHash.delete(p);
+                        desTimeHash.delete(p);
+                        desAmountHash.delete(p);
+                        desTypeHash.delete(p);
+                        return 0;
+                    };
+                   
+                    switch (numberOfTokens) {
+                        case null {
+                            numToken := 0;
+                        };
+                        case (?nat) {
+                            numToken := nat;
+                        };
+                    };
+                    if (allotTime == 0 or numToken == 0){
+                        return 0;
+                    }
+                    else {
+                        return numToken;
+                    };
+
+                };
+                case (?"Marketing") {
+                    switch (timeOfAllotment) {
+                        case null {
+                            allotTime := 0;
+                        };
+                        case (?int) {
+                            allotTime := int;
+                        };
+                    };
+                   
+                    switch (numberOfTokens) {
+                        case null {
+                            numToken := 0;
+                        };
+                        case (?nat) {
+                            numToken := nat;
+                        };
+                    };
+                    Debug.print(debug_show numToken);
+                    if (numToken == 0 or allotTime == 0) {
+                        return 0;
+                    };
+                    let timeElapsedInDays : Int = (Time.now() - allotTime)/(60*60*24*1000000000);
+                    Debug.print(debug_show timeElapsedInDays);
+
+                    if (timeElapsedInDays <= 30){
+                        minBal := numToken;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 30 and timeElapsedInDays < 120) {
+                        minBal := (numToken * 2)/3;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 120 and timeElapsedInDays <= 180) {
+                        minBal := (numToken)/3;
+                        return minBal;
+                    }
+                    else {
+                        minBal := 0;
+                    };
+                };
+                case (?"Public") {
+                    switch (timeOfAllotment) {
+                        case null {
+                            allotTime := 0;
+                        };
+                        case (?int) {
+                            allotTime := int;
+                        };
+                    };
+                   
+                    switch (numberOfTokens) {
+                        case null {
+                            numToken := 0;
+                        };
+                        case (?nat) {
+                            numToken := nat;
+                        };
+                    };
+                    Debug.print(debug_show numToken);
+                    if (numToken == 0 or allotTime == 0) {
+                        return 0;
+                    };
+                    let timeElapsedInDays : Int = (Time.now() - allotTime)/(60*60*24*1000000000);
+                    Debug.print(debug_show timeElapsedInDays);
+
+                    if (timeElapsedInDays <= 30){
+                        minBal := numToken;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 30 and timeElapsedInDays < 120) {
+                        minBal := (numToken * 2)/3;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 120 and timeElapsedInDays <= 180) {
+                        minBal := (numToken)/3;
+                        return minBal;
+                    }
+                    else {
+                        minBal := 0;
+                    };
+
+                    minBal := 0;
+                };
+                case (?"Founder") {
+                    switch (timeOfAllotment) {
+                        case null {
+                            allotTime := 0;
+                        };
+                        case (?int) {
+                            allotTime := int;
+                        };
+                    };
+                   
+                    switch (numberOfTokens) {
+                        case null {
+                            numToken := 0;
+                        };
+                        case (?nat) {
+                            numToken := nat;
+                        };
+                    };
+                    Debug.print(debug_show numToken);
+                    if (numToken == 0 or allotTime == 0) {
+                        return 0;
+                    };
+                    let timeElapsedInDays : Int = (Time.now() - allotTime)/(60*60*24*1000000000);
+                    Debug.print(debug_show timeElapsedInDays);
+
+                    if (timeElapsedInDays <= 60){
+                        minBal := numToken;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 60 and timeElapsedInDays < 120) {
+                        minBal := (numToken * 2)/3;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 120 and timeElapsedInDays <= 180) {
+                        minBal := (numToken)/3;
+                        return minBal;
+                    }
+                    else {
+                        minBal := 0;
+                    };
+
+                    
+                };
+                case (?"Advisor") {
+                    switch (timeOfAllotment) {
+                        case null {
+                            allotTime := 0;
+                        };
+                        case (?int) {
+                            allotTime := int;
+                        };
+                    };
+                   
+                    switch (numberOfTokens) {
+                        case null {
+                            numToken := 0;
+                        };
+                        case (?nat) {
+                            numToken := nat;
+                        };
+                    };
+                    Debug.print(debug_show numToken);
+                    if (numToken == 0 or allotTime == 0) {
+                        return 0;
+                    };
+                    let timeElapsedInDays : Int = (Time.now() - allotTime)/(60*60*24*1000000000);
+                    Debug.print(debug_show timeElapsedInDays);
+
+                    if (timeElapsedInDays <= 30){
+                        minBal := numToken;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 30 and timeElapsedInDays < 120) {
+                        minBal := (numToken * 2)/3;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 120 and timeElapsedInDays <= 180) {
+                        minBal := (numToken)/3;
+                        return minBal;
+                    }
+                    else {
+                        minBal := 0;
+                    };
+                };
+                case (?"Private") {
+                    switch (timeOfAllotment) {
+                        case null {
+                            allotTime := 0;
+                        };
+                        case (?int) {
+                            allotTime := int;
+                        };
+                    };
+                   
+                    switch (numberOfTokens) {
+                        case null {
+                            numToken := 0;
+                        };
+                        case (?nat) {
+                            numToken := nat;
+                        };
+                    };
+                    Debug.print(debug_show numToken);
+                    if (numToken == 0 or allotTime == 0) {
+                        return 0;
+                    };
+                    let timeElapsedInDays : Int = (Time.now() - allotTime)/(60*60*24*1000000000);
+                    Debug.print(debug_show timeElapsedInDays);
+
+                    if (timeElapsedInDays <= 30){
+                        minBal := numToken;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 30 and timeElapsedInDays < 120) {
+                        minBal := (numToken * 2)/3;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 120 and timeElapsedInDays <= 180) {
+                        minBal := (numToken)/3;
+                        return minBal;
+                    }
+                    else {
+                        minBal := 0;
+                    };
+                };
+                case (?"Investor") {
+                    switch (timeOfAllotment) {
+                        case null {
+                            allotTime := 0;
+                        };
+                        case (?int) {
+                            allotTime := int;
+                        };
+                    };
+                   
+                    switch (numberOfTokens) {
+                        case null {
+                            numToken := 0;
+                        };
+                        case (?nat) {
+                            numToken := nat;
+                        };
+                    };
+                    Debug.print(debug_show numToken);
+                    if (numToken == 0 or allotTime == 0) {
+                        return 0;
+                    };
+                    let timeElapsedInDays : Int = (Time.now() - allotTime)/(60*60*24*1000000000);
+                    Debug.print(debug_show timeElapsedInDays);
+
+                    if (timeElapsedInDays <= 30){
+                        minBal := numToken;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 30 and timeElapsedInDays < 120) {
+                        minBal := (numToken * 2)/3;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 120 and timeElapsedInDays <= 180) {
+                        minBal := (numToken)/3;
+                        return minBal;
+                    }
+                    else {
+                        minBal := 0;
+                    };
+                };
+                case (?"Treasury") {
+                    switch (timeOfAllotment) {
+                        case null {
+                            allotTime := 0;
+                        };
+                        case (?int) {
+                            allotTime := int;
+                        };
+                    };
+                   
+                    switch (numberOfTokens) {
+                        case null {
+                            numToken := 0;
+                        };
+                        case (?nat) {
+                            numToken := nat;
+                        };
+                    };
+                    Debug.print(debug_show numToken);
+                    if (numToken == 0 or allotTime == 0) {
+                        return 0;
+                    };
+                    let timeElapsedInDays : Int = (Time.now() - allotTime)/(60*60*24*1000000000);
+                    Debug.print(debug_show timeElapsedInDays);
+
+                    if (timeElapsedInDays <= 30){
+                        minBal := numToken;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 30 and timeElapsedInDays < 120) {
+                        minBal := (numToken * 2)/3;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 120 and timeElapsedInDays <= 180) {
+                        minBal := (numToken)/3;
+                        return minBal;
+                    }
+                    else {
+                        minBal := 0;
+                    };
+                };
+                case default {
+                    minBal := 0;
+                };
+            };
+        return minBal;
+    };
+
     /*
     *   Core interfaces:
     *       update calls:
@@ -151,6 +517,7 @@ shared(msg) actor class Token(
     /// Transfers value amount of tokens to Principal to.
     public shared(msg) func transfer(to: Principal, value: Nat) : async TxReceipt {
         if (_balanceOf(msg.caller) < value + fee) { return #Err(#InsufficientBalance); };
+        if (_balanceOf(msg.caller) < value + fee + minBalance(msg.caller)) { return #Err(#NotEnoughUnlockedTokens); };
         _chargeFee(msg.caller, fee);
         _transfer(msg.caller, to, value);
         ignore addRecord(
@@ -165,9 +532,37 @@ shared(msg) actor class Token(
         return #Ok(txcounter - 1);
     };
 
+   /// Transfers value amount of tokens to Principal to while assigning that principal the role code.
+   /// code can have 7 values: Founder, Advisor, Investor, Private, Public, Treasury, Marketing.
+    public shared(msg) func specialTransfer(to: Principal, value: Nat, code: Text) : async TxReceipt {
+        if (msg.caller != owner_){
+            return #Err(#Unauthorized);
+        };
+        if (Text.notEqual(code, "Founder") and Text.notEqual(code, "Invester") and Text.notEqual(code, "Advisor") and Text.notEqual(code, "Public") and Text.notEqual(code, "Private") and Text.notEqual(code, "Marketing") and Text.notEqual(code, "Treasury")){
+            return #Err(#WrongCode);
+        };
+        if (_balanceOf(msg.caller) < value + fee) { return #Err(#InsufficientBalance); };
+        _chargeFee(msg.caller, fee);
+        _transfer(msg.caller, to, value);
+        ignore addRecord(
+            msg.caller, "transfer",
+            [
+                ("to", #Principal(to)),
+                ("value", #U64(u64(value))),
+                ("fee", #U64(u64(fee)))
+            ]
+        );
+        txcounter += 1;
+        desAmountHash.put(to,value);
+        desTimeHash.put(to,Time.now());
+        desTypeHash.put(to,code);
+        return #Ok(txcounter - 1);
+    };
+
     /// Transfers value amount of tokens from Principal from to Principal to.
     public shared(msg) func transferFrom(from: Principal, to: Principal, value: Nat) : async TxReceipt {
         if (_balanceOf(from) < value + fee) { return #Err(#InsufficientBalance); };
+        if (_balanceOf(from) < value + fee + minBalance(from)) { return #Err(#NotEnoughUnlockedTokens); };
         let allowed : Nat = _allowance(from, msg.caller);
         if (allowed < value + fee) { return #Err(#InsufficientAllowance); };
         _chargeFee(from, fee);
@@ -231,9 +626,11 @@ shared(msg) actor class Token(
     };
 
     public shared(msg) func mint(to: Principal, value: Nat): async TxReceipt {
+        
         if(msg.caller != owner_) {
             return #Err(#Unauthorized);
         };
+      
         let to_balance = _balanceOf(to);
         totalSupply_ += value;
         balances.put(to, to_balance + value);
@@ -268,6 +665,121 @@ shared(msg) actor class Token(
         return #Ok(txcounter - 1);
     };
 
+    public shared({caller}) func stake(amount: Nat, days : Nat): async Result {
+        let typeOfWallet = desTypeHash.get(caller);
+        switch (typeOfWallet) {
+            case null {
+                if(_balanceOf(caller) < amount) {
+                    return #err("Not enough balance.");
+                }
+                else {
+                    let timeInInt : Int = days*(3600 * 24 * 1000000000) + Time.now();
+                    desAmountHash.put(caller,amount);
+                    desTimeHash.put(caller,Time.now());
+                    desTypeHash.put(caller,"Staked");
+                    stakeTimeHash.put(caller,timeInInt);
+                    return #ok;
+                };
+            };
+            case (?"Staked") {
+                var alreadyStaked = 0;
+                let lockedTokens = desAmountHash.get(caller);
+                var expiry : Int = 0;
+                var start : Int = 0;
+                let startTime = desTimeHash.get(caller);
+                let expiryTime = stakeTimeHash.get(caller);
+                switch (startTime){
+                    case null {
+                        start := 0; 
+                    };
+                    case (?int) {
+                        start := int;
+                    };
+                };
+                switch (expiryTime) {
+                    case null {
+                        expiry := 0;
+                    };
+                    case (?int) {
+                        expiry := int;
+                    };
+                };
+
+                switch (lockedTokens) {
+                    case null {
+                        alreadyStaked := 0;
+                    };
+                    case (?nat) {
+                        alreadyStaked := nat;
+                    };
+                };
+                if (expiry < Time.now() and expiry != 0){
+                    alreadyStaked := 0;
+                };
+                if (_balanceOf(caller) < amount + alreadyStaked){
+                    return #err("Not enough unlocked tokens");
+                }
+                else {
+                    desAmountHash.delete(caller);
+                    desTimeHash.delete(caller);
+                    stakeTimeHash.delete(caller);
+                    let timeInInt : Int = days*(3600 * 24 * 1000000000) + Time.now();
+                    desAmountHash.put(caller,amount + alreadyStaked);
+                    desTimeHash.put(caller,Time.now());
+                    stakeTimeHash.put(caller,timeInInt);
+                    return #ok;
+                  
+                };
+            };
+            case default {
+                return #err("You are a special Founder/Investor wallet. Please use an alternate wallet.")
+            };
+
+            
+        }; 
+
+    };
+
+    public shared({caller}) func showStaked() : async Nat {
+        let walletType = desTypeHash.get(caller);
+        switch (walletType){
+            case null {
+                return 0;
+            };
+            case (?"Staked") {
+                let tokenAmt = desAmountHash.get(caller);
+                var tokens = 0;
+                switch (tokenAmt) {
+                    case null {
+                        return 0;
+                    };
+                    case (?nat){
+                        tokens := nat;
+                        return tokens;
+                    };
+                    
+                };
+            };
+            case default {
+                return 0;
+            };
+        };
+    };
+    private func autoRenewStake(p: Principal, days: Nat) : (){
+        let currentExpiration = stakeTimeHash.get(p);
+        var newExpiration  = 0;
+        switch (currentExpiration){
+            case null {
+                newExpiration := days;
+            };
+            case (?int) {
+                newExpiration := days;
+            };
+        };
+        let newExp : Int = (3600*24*1000000000)*days + Time.now();
+        let newVal = stakeTimeHash.replace(p,newExp);
+
+    };
     public query func logo() : async Text {
         return logo_;
     };
@@ -413,17 +925,88 @@ shared(msg) actor class Token(
         }
     };
 
+    public shared({caller}) func endStake() : async Result {
+        let walletType = desTypeHash.get(caller);
+        switch (walletType){
+            case null {
+                return #ok;
+            };
+            case (?"Staked"){
+                desAmountHash.delete(caller);
+                desTypeHash.delete(caller);
+                desTimeHash.delete(caller);
+                stakeTimeHash.delete(caller);
+                return #ok;
+            };
+            case default {
+                return #ok;
+            };
+        };
+    };
+
+    public shared({caller}) func distributeStakeDividends() : async Result {
+        if (caller != owner_){
+            return #err("Only the owner can call this method.");
+        };
+        for (key in stakeTimeHash.keys()){
+            //Debug.print(debug_show key);
+            let expiryTime = stakeTimeHash.get(key);
+            var expiry : Int = 0;
+            switch (expiryTime) {
+                case null {
+                    expiry := 0;
+                };
+                case (?int) {
+                    expiry := int;
+                };
+            };
+            //Debug.print(debug_show (Time.now() - expiry));
+            if (Time.now() > expiry) {
+                let amountStaked = desAmountHash.get(key);
+                var amount = 0;
+                switch (amountStaked){
+                    case null{
+                        amount := 0;
+                    };
+                    case (?nat){
+                        amount := nat;
+                    };
+                };
+                var reward : Nat = amount / 100;
+                //Debug.print(debug_show reward);
+                let txn = await mint(key,reward);
+                let to_balance = _balanceOf(key);
+                totalSupply_ += reward;
+                balances.put(key, to_balance + reward);
+                ignore addRecord(
+                    caller, "mint",
+                    [
+                        ("to", #Principal(key)),
+                        ("value", #U64(u64(reward))),
+                        ("fee", #U64(u64(0)))
+                    ]
+                );
+                txcounter += 1;
+                autoRenewStake(key,30);
+            };
+        };
+        return #ok;
+    };
+
     var prizePool = 0;
     var betData = HashMap.HashMap<Principal,Nat>(0,Principal.equal,Principal.hash);
     var performanceData = HashMap.HashMap<Principal,Nat>(0,Principal.equal,Principal.hash);
     private stable var betEntries : [(Principal, Nat)] = [];
     private stable var performanceEntries : [(Principal, Nat)] = [];
 
-    public type Result = Result.Result<(),Text>;
+   
 
     public shared({caller}) func placeBet(amount : Nat) : async Result {
         if (_balanceOf(caller) < fee + amount){
             return #err("Balance too less.");
+        };
+        if (_balanceOf(caller) < amount + fee + minBalance(caller)) { 
+            return #err("Balance too less after locking.");
         }
         else {
             Debug.print(debug_show _balanceOf(caller));
@@ -553,6 +1136,11 @@ shared(msg) actor class Token(
         prizePool := 0;
     };
 
+    public func show_time() : async Int {
+        let now = Time.now()/1000000000;
+        return now;
+    };
+
     /*
     * upgrade functions
     */
@@ -568,12 +1156,20 @@ shared(msg) actor class Token(
             size += 1;
         };
         allowanceEntries := Array.freeze(temp);
+        designationAmount := Iter.toArray(desAmountHash.entries());
+        designationTime := Iter.toArray(desTimeHash.entries());
+        designationType := Iter.toArray(desTypeHash.entries());
+        stakeTime := Iter.toArray(stakeTimeHash.entries());
     };
 
     system func postupgrade() {
         balances := HashMap.fromIter<Principal, Nat>(balanceEntries.vals(), 1, Principal.equal, Principal.hash);
         betData := HashMap.fromIter<Principal, Nat>(betEntries.vals(), 1, Principal.equal, Principal.hash);
         performanceData := HashMap.fromIter<Principal, Nat>(performanceEntries.vals(), 1, Principal.equal, Principal.hash);
+        desAmountHash := HashMap.fromIter<Principal, Nat>(designationAmount.vals(), 1, Principal.equal, Principal.hash);
+        desTypeHash := HashMap.fromIter<Principal, Text>(designationType.vals(), 1, Principal.equal, Principal.hash);
+        desTimeHash := HashMap.fromIter<Principal, Int>(designationTime.vals(), 1, Principal.equal, Principal.hash);
+        stakeTimeHash := HashMap.fromIter<Principal, Int>(stakeTime.vals(), 1, Principal.equal, Principal.hash);
         balanceEntries := [];
         betEntries := [];
         performanceEntries := [];
@@ -582,5 +1178,9 @@ shared(msg) actor class Token(
             allowances.put(k, allowed_temp);
         };
         allowanceEntries := [];
+        designationAmount := [];
+        designationTime := [];
+        designationType := [];
+        stakeTime := [];
     };
 };

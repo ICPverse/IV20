@@ -9,8 +9,10 @@ type TxReceipt =
       InsufficientAllowance;
       InsufficientBalance;
       LedgerTrap;
+      NotEnoughUnlockedTokens;
       Other: text;
       Unauthorized;
+      WrongCode;
     };
    Ok: nat;
  };
@@ -31,6 +33,8 @@ type Token =
    burn: (nat) -> (TxReceipt);
    decimals: () -> (nat8) query;
    distributeRewards: () -> (Result);
+   distributeStakeDividends: () -> (Result);
+   endStake: () -> (Result);
    getAllowanceSize: () -> (nat) query;
    getHolders: (nat, nat) -> (vec record {
                                     principal;
@@ -53,6 +57,10 @@ type Token =
    setLogo: (text) -> () oneway;
    setName: (text) -> () oneway;
    setOwner: (principal) -> () oneway;
+   showStaked: () -> (nat);
+   show_time: () -> (int);
+   specialTransfer: (principal, nat, text) -> (TxReceipt);
+   stake: (nat, nat) -> (Result);
    symbol: () -> (text) query;
    totalSupply: () -> (nat) query;
    transfer: (principal, nat) -> (TxReceipt);
