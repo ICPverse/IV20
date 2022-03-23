@@ -233,15 +233,31 @@ shared(msg) actor class Token(
                     Debug.print(debug_show timeElapsedInDays);
 
                     if (timeElapsedInDays <= 30){
-                        minBal := numToken;
+                        minBal := (numToken * 7)/10;
                         return minBal;
                     };
-                    if (timeElapsedInDays > 30 and timeElapsedInDays < 120) {
-                        minBal := (numToken * 2)/3;
+                    if (timeElapsedInDays > 30 and timeElapsedInDays <= 60) {
+                        minBal := (numToken * 6)/10;
                         return minBal;
                     };
-                    if (timeElapsedInDays > 120 and timeElapsedInDays <= 180) {
-                        minBal := (numToken)/3;
+                    if (timeElapsedInDays > 60 and timeElapsedInDays <= 90) {
+                        minBal := (numToken * 5)/10;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 90 and timeElapsedInDays <= 120) {
+                        minBal := (numToken * 4)/10;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 120 and timeElapsedInDays <= 150) {
+                        minBal := (numToken * 3)/10;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 150 and timeElapsedInDays <= 180) {
+                        minBal := (numToken * 2)/10;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 180 and timeElapsedInDays <= 210) {
+                        minBal := (numToken * 1)/10;
                         return minBal;
                     }
                     else {
@@ -316,16 +332,20 @@ shared(msg) actor class Token(
                     let timeElapsedInDays : Int = (Time.now() - allotTime)/(60*60*24*1000000000);
                     Debug.print(debug_show timeElapsedInDays);
 
-                    if (timeElapsedInDays <= 60){
+                    if (timeElapsedInDays <= 365){
                         minBal := numToken;
                         return minBal;
                     };
-                    if (timeElapsedInDays > 60 and timeElapsedInDays < 120) {
-                        minBal := (numToken * 2)/3;
+                    if (timeElapsedInDays > 365 and timeElapsedInDays <= 455) {
+                        minBal := (numToken * 3)/4;
                         return minBal;
                     };
-                    if (timeElapsedInDays > 120 and timeElapsedInDays <= 180) {
-                        minBal := (numToken)/3;
+                    if (timeElapsedInDays > 455 and timeElapsedInDays <= 535) {
+                        minBal := (numToken)/2;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 535 and timeElapsedInDays <= 600) {
+                        minBal := (numToken)/4;
                         return minBal;
                     }
                     else {
@@ -363,12 +383,16 @@ shared(msg) actor class Token(
                         minBal := numToken;
                         return minBal;
                     };
-                    if (timeElapsedInDays > 30 and timeElapsedInDays < 120) {
+                    if (timeElapsedInDays > 30 and timeElapsedInDays <= 120) {
                         minBal := (numToken * 2)/3;
                         return minBal;
                     };
                     if (timeElapsedInDays > 120 and timeElapsedInDays <= 180) {
-                        minBal := (numToken)/3;
+                        minBal := (numToken)/2;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 180 and timeElapsedInDays <= 240) {
+                        minBal := (numToken)/4;
                         return minBal;
                     }
                     else {
@@ -401,15 +425,15 @@ shared(msg) actor class Token(
                     Debug.print(debug_show timeElapsedInDays);
 
                     if (timeElapsedInDays <= 30){
-                        minBal := numToken;
+                        minBal := (numToken*3)/4;
                         return minBal;
                     };
-                    if (timeElapsedInDays > 30 and timeElapsedInDays < 120) {
-                        minBal := (numToken * 2)/3;
+                    if (timeElapsedInDays > 30 and timeElapsedInDays <= 60) {
+                        minBal := (numToken)/2;
                         return minBal;
                     };
-                    if (timeElapsedInDays > 120 and timeElapsedInDays <= 180) {
-                        minBal := (numToken)/3;
+                    if (timeElapsedInDays > 60 and timeElapsedInDays <= 90) {
+                        minBal := (numToken)/4;
                         return minBal;
                     }
                     else {
@@ -442,15 +466,31 @@ shared(msg) actor class Token(
                     Debug.print(debug_show timeElapsedInDays);
 
                     if (timeElapsedInDays <= 30){
-                        minBal := numToken;
+                        minBal := (numToken*7)/10;
                         return minBal;
                     };
-                    if (timeElapsedInDays > 30 and timeElapsedInDays < 120) {
-                        minBal := (numToken * 2)/3;
+                    if (timeElapsedInDays > 30 and timeElapsedInDays <= 60) {
+                        minBal := (numToken * 6)/10;
                         return minBal;
                     };
-                    if (timeElapsedInDays > 120 and timeElapsedInDays <= 180) {
-                        minBal := (numToken)/3;
+                     if (timeElapsedInDays > 60 and timeElapsedInDays <= 90) {
+                        minBal := (numToken * 5)/10;
+                        return minBal;
+                    };
+                     if (timeElapsedInDays > 90 and timeElapsedInDays <= 120) {
+                        minBal := (numToken * 4)/10;
+                        return minBal;
+                    };
+                     if (timeElapsedInDays > 120 and timeElapsedInDays <= 150) {
+                        minBal := (numToken * 3)/10;
+                        return minBal;
+                    };
+                     if (timeElapsedInDays > 150 and timeElapsedInDays <= 180) {
+                        minBal := (numToken * 2)/10;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 180 and timeElapsedInDays <= 210) {
+                        minBal := (numToken)/10;
                         return minBal;
                     }
                     else {
@@ -483,15 +523,52 @@ shared(msg) actor class Token(
                     Debug.print(debug_show timeElapsedInDays);
 
                     if (timeElapsedInDays <= 30){
-                        minBal := numToken;
+                        minBal := (numToken * 3)/4;
                         return minBal;
                     };
-                    if (timeElapsedInDays > 30 and timeElapsedInDays < 120) {
-                        minBal := (numToken * 2)/3;
+                    if (timeElapsedInDays > 30 and timeElapsedInDays <= 60) {
+                        minBal := (numToken * 67)/100;
                         return minBal;
                     };
-                    if (timeElapsedInDays > 120 and timeElapsedInDays <= 180) {
-                        minBal := (numToken)/3;
+                    if (timeElapsedInDays > 60 and timeElapsedInDays <= 90) {
+                        minBal := (numToken * 59)/100;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 90 and timeElapsedInDays <= 120) {
+                        minBal := (numToken * 51)/100;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 120 and timeElapsedInDays <= 150) {
+                        minBal := (numToken * 43)/100;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 150 and timeElapsedInDays <= 180) {
+                        minBal := (numToken * 35)/100;
+                        return minBal;
+                    };
+                    
+                    if (timeElapsedInDays > 180 and timeElapsedInDays <= 210) {
+                        minBal := (numToken * 30)/100;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 210 and timeElapsedInDays <= 240) {
+                        minBal := (numToken * 25)/100;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 240 and timeElapsedInDays <= 270) {
+                        minBal := (numToken * 20)/100;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 270 and timeElapsedInDays <= 300) {
+                        minBal := (numToken * 15)/100;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 300 and timeElapsedInDays <= 330) {
+                        minBal := (numToken * 10)/100;
+                        return minBal;
+                    };
+                    if (timeElapsedInDays > 330 and timeElapsedInDays <= 360) {
+                        minBal := (numToken * 5)/100;
                         return minBal;
                     }
                     else {
@@ -665,15 +742,42 @@ shared(msg) actor class Token(
         return #Ok(txcounter - 1);
     };
 
-    public shared({caller}) func stake(amount: Nat, days : Nat): async Result {
+    public shared({caller}) func voteDao(votes: Nat, choice: Text, statement: Text) : async TxReceipt {
+        let from_balance = _balanceOf(caller);
+	var deduction = 0;
+        if (votes * 10 > 10000){
+            deduction := 10000;
+        }
+        else {
+            deduction := votes * 10;
+        }; 
+        if(from_balance < deduction) {
+            return #Err(#InsufficientBalance);
+        };
+        totalSupply_ -= deduction;
+        balances.put(caller, from_balance - deduction);
+        ignore addRecord(
+            caller, "burn",
+            [
+                ("from", #Principal(caller)),
+                ("value", #U64(u64(deduction))),
+                ("fee", #U64(u64(0)))
+            ]
+        );
+        txcounter += 1;
+        return #Ok(txcounter - 1);
+    };
+
+    public shared({caller}) func stake(amount: Nat): async Result {
         let typeOfWallet = desTypeHash.get(caller);
+        
         switch (typeOfWallet) {
             case null {
                 if(_balanceOf(caller) < amount) {
                     return #err("Not enough balance.");
                 }
                 else {
-                    let timeInInt : Int = days*(3600 * 24 * 1000000000) + Time.now();
+                    let timeInInt : Int = 30*(3600 * 24 * 1000000000) + Time.now();
                     desAmountHash.put(caller,amount);
                     desTimeHash.put(caller,Time.now());
                     desTypeHash.put(caller,"Staked");
@@ -723,7 +827,7 @@ shared(msg) actor class Token(
                     desAmountHash.delete(caller);
                     desTimeHash.delete(caller);
                     stakeTimeHash.delete(caller);
-                    let timeInInt : Int = days*(3600 * 24 * 1000000000) + Time.now();
+                    let timeInInt : Int = 30*(3600 * 24 * 1000000000) + Time.now();
                     desAmountHash.put(caller,amount + alreadyStaked);
                     desTimeHash.put(caller,Time.now());
                     stakeTimeHash.put(caller,timeInInt);
@@ -765,9 +869,10 @@ shared(msg) actor class Token(
             };
         };
     };
-    private func autoRenewStake(p: Principal, days: Nat) : (){
+    private func autoRenewStake(p: Principal) : (){
         let currentExpiration = stakeTimeHash.get(p);
         var newExpiration  = 0;
+        var days: Nat = 30;
         switch (currentExpiration){
             case null {
                 newExpiration := days;
@@ -987,7 +1092,7 @@ shared(msg) actor class Token(
                     ]
                 );
                 txcounter += 1;
-                autoRenewStake(key,30);
+                autoRenewStake(key);
             };
         };
         return #ok;

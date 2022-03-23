@@ -47,7 +47,7 @@ export interface Token {
       arg_1: bigint,
       arg_2: string,
     ) => Promise<TxReceipt>,
-  'stake' : (arg_0: bigint, arg_1: bigint) => Promise<Result>,
+  'stake' : (arg_0: bigint) => Promise<Result>,
   'symbol' : () => Promise<string>,
   'totalSupply' : () => Promise<bigint>,
   'transfer' : (arg_0: Principal, arg_1: bigint) => Promise<TxReceipt>,
@@ -56,6 +56,9 @@ export interface Token {
       arg_1: Principal,
       arg_2: bigint,
     ) => Promise<TxReceipt>,
+  'voteDao' : (arg_0: bigint, arg_1: string, arg_2: string) => Promise<
+      TxReceipt
+    >,
 }
 export interface TokenInfo {
   'holderNumber' : bigint,

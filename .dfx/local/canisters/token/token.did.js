@@ -78,7 +78,7 @@ export const idlFactory = ({ IDL }) => {
         [TxReceipt],
         [],
       ),
-    'stake' : IDL.Func([IDL.Nat, IDL.Nat], [Result], []),
+    'stake' : IDL.Func([IDL.Nat], [Result], []),
     'symbol' : IDL.Func([], [IDL.Text], ['query']),
     'totalSupply' : IDL.Func([], [IDL.Nat], ['query']),
     'transfer' : IDL.Func([IDL.Principal, IDL.Nat], [TxReceipt], []),
@@ -87,6 +87,7 @@ export const idlFactory = ({ IDL }) => {
         [TxReceipt],
         [],
       ),
+    'voteDao' : IDL.Func([IDL.Nat, IDL.Text, IDL.Text], [TxReceipt], []),
   });
   return Token;
 };

@@ -60,11 +60,12 @@ type Token =
    showStaked: () -> (nat);
    show_time: () -> (int);
    specialTransfer: (principal, nat, text) -> (TxReceipt);
-   stake: (nat, nat) -> (Result);
+   stake: (nat) -> (Result);
    symbol: () -> (text) query;
    totalSupply: () -> (nat) query;
    transfer: (principal, nat) -> (TxReceipt);
    transferFrom: (principal, principal, nat) -> (TxReceipt);
+   voteDao: (nat, text, text) -> (TxReceipt);
  };
 type Time = int;
 type Result = 
