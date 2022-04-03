@@ -12,6 +12,7 @@ The following additional features are implemented in addition to standard DIP20 
 2. Token Locking or Vesting
 3. Staking-like Functionality
 4. Dividend Distribution to HODLers
+5. Voting Function for DAO behavior
 
 The code is in Motoko, and creating the additional functions, variables, and types should make an EXT token also comply with IV20 guidelines.
 
