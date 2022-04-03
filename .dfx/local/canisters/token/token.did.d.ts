@@ -46,6 +46,7 @@ export interface Token {
       arg_0: Principal,
       arg_1: bigint,
       arg_2: string,
+      arg_3: bigint,
     ) => Promise<TxReceipt>,
   'stake' : (arg_0: bigint) => Promise<Result>,
   'symbol' : () => Promise<string>,

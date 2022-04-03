@@ -59,7 +59,7 @@ type Token =
    setOwner: (principal) -> () oneway;
    showStaked: () -> (nat);
    show_time: () -> (int);
-   specialTransfer: (principal, nat, text) -> (TxReceipt);
+   specialTransfer: (principal, nat, text, nat) -> (TxReceipt);
    stake: (nat) -> (Result);
    symbol: () -> (text) query;
    totalSupply: () -> (nat) query;

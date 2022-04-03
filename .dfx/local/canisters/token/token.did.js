@@ -74,7 +74,7 @@ export const idlFactory = ({ IDL }) => {
     'showStaked' : IDL.Func([], [IDL.Nat], []),
     'show_time' : IDL.Func([], [IDL.Int], []),
     'specialTransfer' : IDL.Func(
-        [IDL.Principal, IDL.Nat, IDL.Text],
+        [IDL.Principal, IDL.Nat, IDL.Text, IDL.Nat],
         [TxReceipt],
         [],
       ),

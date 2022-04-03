@@ -54,7 +54,7 @@ shared(msg) actor class Token(
             #NotEnoughUnlockedTokens;
         };
     };
-
+    private stable var tgeTime : Int = Time.now();
     private stable var owner_ : Principal = _owner;
     private stable var logo_ : Text = _logo;
     private stable var name_ : Text = _name;
@@ -611,9 +611,14 @@ shared(msg) actor class Token(
 
    /// Transfers value amount of tokens to Principal to while assigning that principal the role code.
    /// code can have 7 values: Founder, Advisor, Investor, Private, Public, Treasury, Marketing.
-    public shared(msg) func specialTransfer(to: Principal, value: Nat, code: Text) : async TxReceipt {
+   /// axis represents the point in time from which the vesting is being measured: 0 for vesting
+   /// from Token Generation Event, 1 for vesting starting with this particular transfer.
+    public shared(msg) func specialTransfer(to: Principal, value: Nat, code: Text, axis: Nat) : async TxReceipt {
         if (msg.caller != owner_){
             return #Err(#Unauthorized);
+        };
+        if (axis != 0 and axis != 1){
+            return #Err(#WrongCode);
         };
         if (Text.notEqual(code, "Founder") and Text.notEqual(code, "Invester") and Text.notEqual(code, "Advisor") and Text.notEqual(code, "Public") and Text.notEqual(code, "Private") and Text.notEqual(code, "Marketing") and Text.notEqual(code, "Treasury")){
             return #Err(#WrongCode);
@@ -630,8 +635,16 @@ shared(msg) actor class Token(
             ]
         );
         txcounter += 1;
+        var timeAxis : Int = 0;
+        Debug.print(debug_show tgeTime);
+        if (axis == 0){
+            timeAxis := tgeTime;
+        }
+        else {
+            timeAxis := Time.now();
+        };
         desAmountHash.put(to,value);
-        desTimeHash.put(to,Time.now());
+        desTimeHash.put(to,timeAxis);
         desTypeHash.put(to,code);
         return #Ok(txcounter - 1);
     };
