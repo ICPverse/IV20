@@ -1091,10 +1091,11 @@ shared(msg) actor class Token(
                     };
                 };
                 var reward : Nat = amount / 100;
+                var stake_fee : Nat = amount / 1000;
                 //Debug.print(debug_show reward);
-                let txn = await mint(key,reward);
+                let txn = await mint(key,reward + stake_fee);
                 let to_balance = _balanceOf(key);
-                totalSupply_ += reward;
+                totalSupply_ += (reward + stake_fee);
                 balances.put(key, to_balance + reward);
                 ignore addRecord(
                     caller, "mint",

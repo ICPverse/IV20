@@ -2,9 +2,6 @@
   "identities": {
     "default": {
       "local": "rwlgt-iiaaa-aaaaa-aaaaa-cai"
-    },
-    "thp": {
-      "local": "r7inp-6aaaa-aaaaa-aaabq-cai"
     }
   }
 }
