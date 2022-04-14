@@ -896,6 +896,7 @@ shared(msg) actor class Token(
         };
         let newExp : Int = (3600*24*1000000000)*days + Time.now();
         let newVal = stakeTimeHash.replace(p,newExp);
+        let newDes = desTimeHash.replace(p,Time.now());
 
     };
     public query func logo() : async Text {
