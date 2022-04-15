@@ -3,7 +3,7 @@ This is the code for IV20, the token guidelines for Game and Metaverse project t
 
 Note: IV20 is a token guideline, not a token standard.
 
-IV20 is built on top on DIP20, created by the Psychedelic Team.
+IV20 extends DIP20.
 
 IV20 is compatible with both IS20 and DIP20 tokens. All IS20 / DIP20 tokens are not IV20, but all IV20 tokens are DIP20 / IS20.
 
@@ -26,5 +26,10 @@ cd IV20
 
 dfx start --background
 
-dfx deploy token --argument '("","TOKENNAME","TKN",3,10000000, principal "<your-principal-here>",50)'
+dfx deploy token --argument '("","TOKENNAME","TKN",3,10000000, principal "<your-principal-here>", <your fee here, for ex 50>)'
+  
+Acknowledgements:
+Psychedelic Team for DIP20
+Infinity Swap Team for IS20
+GLdev, Ossian, and Saikat Das for Code Advisory
 
