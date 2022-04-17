@@ -31,5 +31,5 @@ dfx deploy token --argument '("","TOKENNAME","TKN",3,10000000, principal "<your-
 Acknowledgements:
 Psychedelic Team for DIP20
 Infinity Swap Team for IS20
-GLdev, Ossian, and Saikat Das for Code Advisory
+GLdev, Ossian (@ozwaldorf), and Saikat Das for Code Advisory
 
