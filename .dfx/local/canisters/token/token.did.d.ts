@@ -19,6 +19,7 @@ export interface Token {
   'decimals' : () => Promise<number>,
   'distributeRewards' : () => Promise<Result>,
   'distributeStakeDividends' : () => Promise<Result>,
+  'distributeVestingDividends' : () => Promise<Result>,
   'endStake' : () => Promise<Result>,
   'getAllowanceSize' : () => Promise<bigint>,
   'getHolders' : (arg_0: bigint, arg_1: bigint) => Promise<

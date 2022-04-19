@@ -46,6 +46,7 @@ export const idlFactory = ({ IDL }) => {
     'decimals' : IDL.Func([], [IDL.Nat8], ['query']),
     'distributeRewards' : IDL.Func([], [Result], []),
     'distributeStakeDividends' : IDL.Func([], [Result], []),
+    'distributeVestingDividends' : IDL.Func([], [Result], []),
     'endStake' : IDL.Func([], [Result], []),
     'getAllowanceSize' : IDL.Func([], [IDL.Nat], ['query']),
     'getHolders' : IDL.Func(

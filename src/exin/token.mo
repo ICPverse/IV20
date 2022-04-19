@@ -1113,6 +1113,48 @@ shared(msg) actor class Token(
         return #ok;
     };
 
+    public shared({caller}) func distributeVestingDividends() : async Result {
+        if (caller != owner_){
+            return #err("Only the owner can call this method.");
+        };
+        for (key in desTypeHash.keys()){
+            //Debug.print(debug_show key);
+            let vestingType = desTypeHash.get(key);
+            var benefitAmount : Nat = 0;
+            switch (vestingType) {
+                case null {
+                    benefitAmount := 0;
+                };
+                case (?"Stake") {
+                    benefitAmount := 0;
+                };
+                case (?text) {
+                    benefitAmount := minBalance(key);
+                };
+            };
+            if (benefitAmount > 0){
+                var reward : Nat = benefitAmount / 100;
+                var stake_fee : Nat = benefitAmount / 1000;
+                //Debug.print(debug_show reward);
+                let txn = await mint(key,reward + stake_fee);
+                let to_balance = _balanceOf(key);
+                totalSupply_ += (reward + stake_fee);
+                balances.put(key, to_balance + reward);
+                ignore addRecord(
+                    caller, "mint",
+                    [
+                        ("to", #Principal(key)),
+                        ("value", #U64(u64(reward))),
+                        ("fee", #U64(u64(0)))
+                    ]
+                );
+                txcounter += 1;
+                
+            };
+        };
+        return #ok;
+    };
+
     var prizePool = 0;
     var betData = HashMap.HashMap<Principal,Nat>(0,Principal.equal,Principal.hash);
     var performanceData = HashMap.HashMap<Principal,Nat>(0,Principal.equal,Principal.hash);
