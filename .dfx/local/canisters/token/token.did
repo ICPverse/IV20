@@ -6,6 +6,7 @@ type TxReceipt =
       BlockUsed;
       ErrorOperationStyle;
       ErrorTo;
+      IncompatibleSpecialTransferCombination;
       InsufficientAllowance;
       InsufficientBalance;
       LedgerTrap;
@@ -42,6 +43,7 @@ type Token =
                                     nat;
                                   }) query;
    getMetadata: () -> (Metadata) query;
+   getMyStats: () -> (text);
    getTokenFee: () -> (nat) query;
    getTokenInfo: () -> (TokenInfo) query;
    getUserApprovals: (principal) -> (vec record {

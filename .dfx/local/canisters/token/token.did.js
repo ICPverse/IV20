@@ -3,6 +3,7 @@ export const idlFactory = ({ IDL }) => {
     'Ok' : IDL.Nat,
     'Err' : IDL.Variant({
       'InsufficientAllowance' : IDL.Null,
+      'IncompatibleSpecialTransferCombination' : IDL.Null,
       'InsufficientBalance' : IDL.Null,
       'ErrorOperationStyle' : IDL.Null,
       'Unauthorized' : IDL.Null,
@@ -55,6 +56,7 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getMetadata' : IDL.Func([], [Metadata], ['query']),
+    'getMyStats' : IDL.Func([], [IDL.Text], []),
     'getTokenFee' : IDL.Func([], [IDL.Nat], ['query']),
     'getTokenInfo' : IDL.Func([], [TokenInfo], ['query']),
     'getUserApprovals' : IDL.Func(

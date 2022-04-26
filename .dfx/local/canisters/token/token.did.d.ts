@@ -26,6 +26,7 @@ export interface Token {
       Array<[Principal, bigint]>
     >,
   'getMetadata' : () => Promise<Metadata>,
+  'getMyStats' : () => Promise<string>,
   'getTokenFee' : () => Promise<bigint>,
   'getTokenInfo' : () => Promise<TokenInfo>,
   'getUserApprovals' : (arg_0: Principal) => Promise<
@@ -73,6 +74,7 @@ export interface TokenInfo {
 export type TxReceipt = { 'Ok' : bigint } |
   {
     'Err' : { 'InsufficientAllowance' : null } |
+      { 'IncompatibleSpecialTransferCombination' : null } |
       { 'InsufficientBalance' : null } |
       { 'ErrorOperationStyle' : null } |
       { 'Unauthorized' : null } |
