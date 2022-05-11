@@ -151,6 +151,12 @@ shared(msg) actor class Token(
         Nat64.fromNat(i)
     };
 
+    /*
+    This function checks for the minimum balance a wallet is expected to have (that cannot be sold or transferred).
+    This check is needed in case a certain number of tokens are "staked", or the wallet belongs to a special role
+    such as a Founder, Seed investor, Advisor, etc. 
+    The entire vesting schedule for such wallets in enshrined in this function.
+    */
     func minBalance(p : Principal) : Nat {
         var minBal = 0;
         var allotTime : Int = 0;
@@ -838,10 +844,13 @@ shared(msg) actor class Token(
         return #Ok(txcounter - 1);
     };
 
-   /// Transfers value amount of tokens to Principal to while assigning that principal the role code.
-   /// code can have 8 values: Founder, Advisor, Preseed, Seed, Private, Public, Treasury, Marketing.
-   /// axis represents the point in time from which the vesting is being measured: 0 for vesting
-   /// from Token Generation Event, 1 for vesting starting with this particular transfer.
+   /* Transfers value amount of tokens to Principal to while assigning that principal the role code.
+      code can have 8 values: Founder, Advisor, Preseed, Seed, Private, Public, Treasury, Marketing.
+      axis represents the point in time from which the vesting is being measured: 0 for vesting
+      from Token Generation Event, 1 for vesting starting with this particular transfer.
+      The function also ensures that non compatible combinations like Preseed Public, or Advisor Treasury are 
+      not assigned. The compatible combinations like SeedAdvisor and SeedPreseed are auto created as well.
+    */
     public shared(msg) func specialTransfer(to: Principal, value: Nat, code: Text, axis: Nat) : async TxReceipt {
         if (msg.caller != owner_){
             return #Err(#Unauthorized);
@@ -1035,6 +1044,10 @@ shared(msg) actor class Token(
         return #Ok(txcounter - 1);
     };
 
+    /*
+      This function is called for voting purposes. The maximum votes per wallet are capped such that
+      the net burn does not exceed 10000 tokens.
+    */
     public shared({caller}) func voteDao(votes: Nat, choice: Text, statement: Text) : async TxReceipt {
         let from_balance = _balanceOf(caller);
 	var deduction = 0;
@@ -1061,6 +1074,11 @@ shared(msg) actor class Token(
         return #Ok(txcounter - 1);
     };
 
+    /*
+        A "stakelike" functionality is created whereby the user can lock an amount of tokens and receive 
+        monthly dividends. It is different from "true" staking in that ICPV does not have its own block
+        chain, and hence no nodes. But from the user perspective, the behavior mimics staking.
+    */
     public shared({caller}) func stake(amount: Nat): async Result {
         let typeOfWallet = desTypeHash.get(caller);
         
@@ -1162,6 +1180,11 @@ shared(msg) actor class Token(
             };
         };
     };
+
+    /*
+        The default functional behavior is to automatically renew the stakes every month end, but a subsequent 
+        function shall exist to terminate the staked position at any point.
+    */
     private func autoRenewStake(p: Principal) : (){
         let currentExpiration = stakeTimeHash.get(p);
         var newExpiration  = 0;
@@ -1348,6 +1371,11 @@ shared(msg) actor class Token(
         return "Wallet Address " # Principal.toText(caller) # " of type " # typeInfo # " and balance: " # Nat.toText(balance);
     };
 
+
+    /*
+        Manually end your staked positions such that all tokens (non vested) get immediately unlocked.
+        Necessary to counter the auto stake functionality.
+    */
     public shared({caller}) func endStake() : async Result {
         let walletType = desTypeHash.get(caller);
         switch (walletType){
@@ -1367,6 +1395,10 @@ shared(msg) actor class Token(
         };
     };
 
+    /*
+        Function to distribute the staking rewards. Will be automatically called from the JS layer
+        every month end.
+    */
     public shared({caller}) func distributeStakeDividends() : async Result {
         if (caller != owner_){
             return #err("Only the owner can call this method.");
@@ -1417,6 +1449,10 @@ shared(msg) actor class Token(
         return #ok;
     };
 
+    /*
+        The reward system for the vested wallets (since explicit staking isn't allowed for them to avoid whale
+        activity). Gets called automatically every month end from the JS layer.
+    */
     public shared({caller}) func distributeVestingDividends() : async Result {
         if (caller != owner_){
             return #err("Only the owner can call this method.");
@@ -1466,7 +1502,10 @@ shared(msg) actor class Token(
     private stable var performanceEntries : [(Principal, Nat)] = [];
 
    
-
+    /*
+        The betting function for anyone playing an externally integrated P2E game on the platform.
+        Helps bring even non on chain games IC connectivity as a P2E.
+    */
     public shared({caller}) func placeBet(amount : Nat) : async Result {
         if (_balanceOf(caller) < fee + amount){
             return #err("Balance too less.");
@@ -1506,12 +1545,21 @@ shared(msg) actor class Token(
     };
     //Below are test values with 4 identities created locally and they are useful only for test purposes with 
     //the corresponding values obtained from your own 4 created identities.
-/*
-    receivePerformanceData(Principal.fromText("qtuga-kg7hz-d56lf-kfuak-jy6gl-jzfeg-iavcg-a2d2v-bh2cp-egdc2-kqe"),1);
-    receivePerformanceData(Principal.fromText("ye3vr-uyipa-xdzgw-obowr-ouiwt-uiug3-b34te-xsrfs-orwos-nuok4-qqe"),2);
-    receivePerformanceData(Principal.fromText("o3kju-fu2qh-kcth4-jxmet-37zti-m3shd-nns7f-keorq-zp3xd-vwd42-kqe"),3);
-    receivePerformanceData(Principal.fromText("whp3z-x6a6g-qewwq-ewcce-j72e5-rua3p-x2ake-4ujl5-j545k-sfkvv-zqe"),4);
-*/
+    /*
+        receivePerformanceData(Principal.fromText("qtuga-kg7hz-d56lf-kfuak-jy6gl-jzfeg-iavcg-a2d2v-bh2cp-egdc2-kqe"),1);
+        receivePerformanceData(Principal.fromText("ye3vr-uyipa-xdzgw-obowr-ouiwt-uiug3-b34te-xsrfs-orwos-nuok4-qqe"),2);
+        receivePerformanceData(Principal.fromText("o3kju-fu2qh-kcth4-jxmet-37zti-m3shd-nns7f-keorq-zp3xd-vwd42-kqe"),3);
+        receivePerformanceData(Principal.fromText("whp3z-x6a6g-qewwq-ewcce-j72e5-rua3p-x2ake-4ujl5-j545k-sfkvv-zqe"),4);
+    */
+
+
+
+
+    /*
+        The function to distribute the P2E rewards for the externally integrated games on the platform.
+        A small platform fee is kept and the remaining is distributed to the top performers as a weighed
+        fraction of both, their ante and their position on the leaderboard.
+    */
     public shared({caller}) func distributeRewards() : async Result {
         if (caller != owner_){
             return #err("Only the owner can access this method");
@@ -1594,6 +1642,11 @@ shared(msg) actor class Token(
     //The above function uses a dual-weighed discrete distributed system to assign weights for each winner
     //based on both: rank and amount they bet.
 
+
+    /*
+        Resets the contest after distributing the rewards for the previous contest period.
+        The contest period for all leaderboard games is currently set to 7 days.
+    */
     func resetContest() : () {
         betEntries := [];
         performanceEntries := [];
